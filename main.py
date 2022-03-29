@@ -14,19 +14,25 @@ pts2 = np.float32([[0, 0], [400, 0], [0, 550], [400, 550]])
 matrix = cv2.getPerspectiveTransform(pts1, pts2)
 #warp image
 result = cv2.warpPerspective(img, matrix, (400,550))
+width2 =result.shape[0]
+height2=result.shape[1]
 x1= -100
 y1=520
-x2=
-y2=
-x3=
-y3=
-x4=
-y4=
+x2=500
+y2=520
+x3=-100
+y3=550
+x4=500
+y4=550
 for x in range(20):
-        pts1 = np.float32([[773, 1968], [2088, 1958], [271, 3257], [2828, 3207]])
+        pts1 = np.float32([[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
         pts2 = np.float32([[0, 0], [400, 0], [0, 550], [400, 550]])
+        matrix = cv2.getPerspectiveTransform(pts1, pts2)
+        #warp image
+        maybe = cv2.warpPerspective(result, matrix, (550,400))
+        
         #gray and edge
-        gray = cv2.cvtColor(result,cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(maybe,cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray,50,150,apertureSize = 3)
 
         #find lines
