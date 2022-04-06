@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # change name of image file
-img = cv2.imread("image1.jpg", 1)
+img = cv2.imread("image2.jpg", 1)
 
 height = img.shape[0]
 width = img.shape[1]
@@ -18,33 +18,33 @@ width2 = result.shape[0]
 height2 = result.shape[1]
 cv2.imwrite('test1.jpg', result)
 x1 = 0
-y1 = 520
+y1 = 500
 x2 = 400
-y2 = 520
+y2 = 500
 x3 = 0
 y3 = 550
 x4 = 400
 y4 = 550
-for x in range(1):
+for x in range(2):
     pts1 = np.float32([[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
-    pts2 = np.float32([[0, 0], [400, 0], [0, 550], [400, 550]])
+    pts2 = np.float32([[0, 0], [400, 0], [0, 50], [400, 50]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     # warp image
-    maybe = cv2.warpPerspective(result, matrix, (400, 550))
+    maybe = cv2.warpPerspective(result, matrix, (400, 50))
     cv2.imwrite('maybe.jpg', maybe)
     # gray and edge
     gray = cv2.cvtColor(maybe, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
 
     # find lines
-    linesP = cv2.HoughLinesP(edges, 1, np.pi / 180, 15, None, 50, 10)
+    linesP = cv2.HoughLinesP(edges, 1, np.pi / 180, 15, None, 30, 10)
     # sort lines
     c = 9000
     d = 0
     try:
         for i in linesP:
             l = i[0]
-            cv2.line(maybe, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv2.LINE_AA)
+            cv2.line(maybe, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 1, cv2.LINE_AA)
             if (l[0] < c):
                 line1 = i
                 c = l[0]
@@ -54,12 +54,14 @@ for x in range(1):
     except:
         line1 =[[10,20,30,40]]
         line2 =[[10,30,20,40]]
+    cv2.line(maybe, (line1[0][0], line1[0][1]), (line1[0][2], line1[0][3]), (255, 0, 255), 3, cv2.LINE_AA)
+    cv2.line(maybe, (line2[0][0], line2[0][1]), (line2[0][2], line2[0][3]), (255, 0, 255), 3, cv2.LINE_AA)
     cv2.imwrite('line.jpg', maybe)
     # draw left most and right most lines
     info1 = line1[0]
     info2 = line2[0]
-    y1 = int((info1[1] + info2[1]) / 2)
-    y2 = int((info1[3] + info2[3]) / 2)
+    y1 = int((info1[1] + info2[3]) / 2)
+    y2 = int((info1[3] + info2[1]) / 2)
     pt1 = (int((info1[0] + info2[0]) / 2), y1)
     pt2 = (int((info1[2] + info2[2]) / 2), y2)
     if (y1 > y2):
@@ -81,10 +83,10 @@ for x in range(1):
     y3 = info4 - 5*info5
     x4 = info3+ 5*info6
     y4 = info4 + 5*info5
-
+    cv2.imwrite("test4.jpg", maybe)
     matrix2 = cv2.getPerspectiveTransform(pts2, pts1)
-    test1 = cv2.warpPerspective(maybe, matrix2, (400,550))
-
+    test1 = cv2.warpPerspective(maybe, matrix2, (400, 550))
+    cv2.imwrite("test6.jpg", test1)
     roi = result[0:550, 0:400]
     # Now create a mask of logo and create its inverse mask also
     img2gray = cv2.cvtColor(test1, cv2.COLOR_BGR2GRAY)
