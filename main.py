@@ -10,14 +10,14 @@ width = img.shape[1]
 
 #pts1 = np.float32([[773, 1968], [2088, 1958], [271, 3257], [2828, 3207]])
 pts3 = np.float32([[837, 1597], [2201, 1573], [103, 2610], [2870, 2594]])
-pts4 = np.float32([[0, 0], [2000, 0], [0, 2000], [2000, 2000]])
+#pts4 = np.float32([[0, 0], [2000, 0], [0, 2000], [2000, 2000]])
 
-matrix = cv2.getPerspectiveTransform(pts3, pts4)
+#matrix = cv2.getPerspectiveTransform(pts3, pts4)
 pts5 = np.float32([[3000, 1000], [5000, 1000], [3000, 3000], [5000, 3000]])
-matrix2 = cv2.getPerspectiveTransform(pts4, pts5)
+matrix2 = cv2.getPerspectiveTransform(pts3, pts5)
 # warp image
-image1 = cv2.warpPerspective(img, matrix, (2000, 2000))
-image2 = cv2.warpPerspective(image1, matrix2, (8000, 6000))
+#image1 = cv2.warpPerspective(img, matrix, (2000, 2000))
+image2 = cv2.warpPerspective(img, matrix2, (8000, 6000))
 width2 = image2.shape[0]
 height2 = image2.shape[1]
 cv2.imwrite('test1.jpg', image2)
@@ -27,7 +27,7 @@ control = 1
 
 while(1==1):
     #get box
-    result = image2[2900:3000, 3900:5600]
+    result = image2[2900:3000, 3100:4900]
     cv2.imwrite("test2.jpg",result)
 
     #gray and edge
@@ -35,7 +35,7 @@ while(1==1):
     edges = cv2.Canny(gray,50,150,apertureSize = 3)
 
     #find lines
-    linesP = cv2.HoughLinesP(edges, 1, np.pi / 180, 0, None, 50, 10)
+    linesP = cv2.HoughLinesP(edges, 1, np.pi / 180, 0, None, 10, 10)
     #sort lines
     c=9000
     d=0
@@ -43,7 +43,7 @@ while(1==1):
     try:
         for i in linesP:
             l = i[0]
-            #cv2.line(result, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv2.LINE_AA)
+            cv2.line(result, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv2.LINE_AA)
             if (l[0]<c):
                 line1 =i
                 c= l[0]
@@ -56,8 +56,8 @@ while(1==1):
 
     info1 = line1[0]
     info2 =line2[0]
-    #cv2.line(result, (info1[0], info1[1]), (info1[2], info1[3]), (0, 0, 255), 3, cv2.LINE_AA)
-    #cv2.line(result, (info2[0], info2[1]), (info2[2], info2[3]), (0, 0, 255), 3, cv2.LINE_AA)
+    cv2.line(result, (info1[0], info1[1]), (info1[2], info1[3]), (0, 0, 255), 3, cv2.LINE_AA)
+    cv2.line(result, (info2[0], info2[1]), (info2[2], info2[3]), (0, 0, 255), 3, cv2.LINE_AA)
     #make arrow longer
     if(abs(info1[1] - info2[1]) <=20):
         y1= int((info1[1] +info2[1])/2)
@@ -69,15 +69,16 @@ while(1==1):
         y2 =int((info1[3] +info2[1])/2)
         x1 =int(((info1[0]) +int(info2[0]))/2)
         x2 =int((info1[2] +info2[2])/2)
-    if (x1<4000 and control ==1):
+    print(x1)
+    if (x1<1000 and control ==1):
         control1 =1
         rotate =10
         Cx = 5000
-        Cy =5000
+        Cy =3000
         control =0
-    elif(x1>=4000 and control ==1):
+    elif(x1>=1000 and control ==1):
         control1 =0
-        rotate =-10
+        rotate =350
         Cx=3000
         Cy=3000
         control =0
@@ -91,20 +92,18 @@ while(1==1):
         pt2 = pt1
         pt1 = n
         cv2.arrowedLine(result, pt1, pt2, (255, 0, 0), 10, cv2.LINE_AA)
-    #rotate image
 
-    print("1")
-    #rotate = 360-(90-rotate)
-    # rotate our image by 45 degrees around the center of the image
+    # rotate image
+    sum = sum+rotate
     M = cv2.getRotationMatrix2D((Cx, Cy), rotate, 1.0)
-    image2= cv2.warpAffine(image2, M, (9000, 9000))
+    image2= cv2.warpAffine(image2, M, (8000, 6000))
 
     cv2.imwrite("Rotated_by_x_Degrees.jpg", image2)
-
-
-""""
-
-pts4 = np.float32([[100, 500], [100, 300], [300, 500], [300, 300]])
+ban = sum%360
+apple = 360-ban
+M = cv2.getRotationMatrix2D((Cx, Cy), apple, 1.0)
+image2= cv2.warpAffine(image2, M, (8000, 6000))
+#pts4 = np.float32([[00, 500], [100, 300], [300, 500], [300, 300]])
 matrix2 = cv2.getPerspectiveTransform(pts5, pts3)
 final = cv2.warpPerspective(image2, matrix2, (width, height))
 
@@ -121,5 +120,5 @@ img2_fg = cv2.bitwise_and(final,final,mask = mask)
 # Put logo in ROI and modify the main image
 dst = cv2.add(img1_bg,img2_fg)
 img[0:height, 0:width ] = dst
-"""
+
 cv2.imwrite('final.jpg',img)
