@@ -3,7 +3,7 @@ import numpy as np
 from math import *
 
 # change name of image file
-img = cv2.imread("image3.jpg", 1)
+img = cv2.imread("image2.jpg", 1)
 
 height = img.shape[0]
 width = img.shape[1]
